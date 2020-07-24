@@ -10,6 +10,8 @@ import json
 from urllib.request import urlopen
 from pathlib import Path
 
+# funcao que gera um grafico de total de casos 
+# confirmados + novos casos por dia
 def plot1(datafull):
   datagroup = datafull[(datafull.city.isna())].groupby(['date']).sum().reset_index()
   datagroup['date'] = range(len(datagroup['date'].values))
@@ -26,18 +28,21 @@ def plot1(datafull):
 
   return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
+# funcao que gera um grafico de novos casos confirmados 
+# em escala logaritmica
 def plot2(datafull):
   datagroup = datafull[(datafull.city.isna())].groupby(['date']).sum().reset_index()
   datagroup['date'] = range(len(datagroup['date'].values))
 
   fig = go.Figure()
   fig.add_trace(go.Scatter(x=datagroup['date'], y=datagroup['new_confirmed'], 
-                                  mode='lines+markers', name="Total de casos confirmados"))
-  #fig.add_trace(go.Bar(x=datagroup['date'], y=datagroup['new_confirmed'], name="Novos casos confirmados"))
+                                  mode='lines+markers', name="Novos casos confirmados"))
   fig.update_layout(yaxis_type='log')
   
   return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
+# funcao para gerar grafico de casos totais, agrupados por estado
+# em escala logaritmica
 def plot3(datafull):
   colores = ['aliceblue', 'azure', 'beige', 'bisque', 'black', 
            'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 
@@ -81,20 +86,22 @@ def plot3(datafull):
 
   return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
-def plot4(datafull, data):
+# funcao para gerar heatmap do brasil de casos confirmados por municipio
+# por 100k habitantes
+def plot4(datafull, geo_data):
   datacity = datafull[(datafull.city.isna() ==  False) & (datafull.is_last)]
 
   datagroup = datacity.groupby([datacity.city_ibge_code, datacity.city]).last_available_confirmed_per_100k_inhabitants.max().reset_index()
 
   datagroup['city_ibge_code'] = datagroup['city_ibge_code'].astype(int)
   datagroup['city_ibge_code'] = datagroup['city_ibge_code'].astype(str)
-  datagroup['last_available_confirmed_per_100k_inhabitants'] /= \
+  datagroup['last_available_confirmed_per_100k_inhabitants'] = \
             datagroup['last_available_confirmed_per_100k_inhabitants'].fillna(0) 
 
   maxvalue = datagroup[datagroup['last_available_confirmed_per_100k_inhabitants'] != 0]
   maxvalue = maxvalue.quantile(0.95)[0]
-
-  fig = px.choropleth_mapbox(datagroup, geojson=data, locations='city_ibge_code', 
+  
+  fig = px.choropleth_mapbox(datagroup, geojson=geo_data, locations='city_ibge_code', 
                             color='last_available_confirmed_per_100k_inhabitants',
                             color_continuous_scale="Viridis",
                             featureidkey="properties.id",
@@ -111,29 +118,41 @@ def plot4(datafull, data):
 
   return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
+# funcao que cria a lista de graficos quie serao inseridos no html
+# devido ao custo de gerar os graficos, eles estao sendo pre 
+# computados
 def plots_list():
-  # data_file = Path('website/plots').absolute() / 'caso_full.csv'
-
-  # sns.set(style="darkgrid")
-  # datafull = pd.read_csv(data_file, encoding='utf-8')
-  # datafull = pd.DataFrame(data=datafull)
-
-  # with open(Path('website/plots').absolute() / 'geojs-100-mun.json', encoding='latin-1') as fh:
-  #     data = json.load(fh)
-
-  # return [plot1(datafull),
-  #         plot2(datafull),
-  #         plot3(datafull),
-  #         plot4(datafull, data)]
-
   plots = []
 
   for plot in ['graph1.html', 'graph2.html', 'graph3.html', 'graph4.html']:
     with open(Path('website/plots').absolute() / plot) as f:
       plots.append(f.read()) 
 
-  # print(plots)
   return plots
 
+# driver para gerar os aquivos pre-computados
+def main():
+  data_file = 'caso_full.csv'
+
+  sns.set(style="darkgrid")
+  datafull = pd.read_csv(data_file, encoding='utf-8')
+  datafull = pd.DataFrame(data=datafull)
+
+  with open('geojs-100-mun.json', encoding='latin-1') as fh:
+      geo_data = json.load(fh)
+
+  with open('graph1.html', 'w+') as f:
+    f.write(plot1(datafull))
+
+  with open('graph2.html', 'w+') as f:
+    f.write(plot2(datafull))
+
+  with open('graph3.html', 'w+') as f:
+    f.write(plot3(datafull))
+
+  with open('graph4.html', 'w+') as f:
+    f.write(plot4(datafull, geo_data))
+
+
 if __name__ == '__main__':
-  print(plots_list())
+  main()
