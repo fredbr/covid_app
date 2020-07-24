@@ -112,19 +112,28 @@ def plot4(datafull, data):
   return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
 def plots_list():
-  data_file = Path('website/plots').absolute() / 'caso_full.csv'
+  # data_file = Path('website/plots').absolute() / 'caso_full.csv'
 
-  with open(Path('website/plots').absolute() / 'geojs-100-mun.json', encoding='latin-1') as fh:
-      data = json.load(fh)
+  # sns.set(style="darkgrid")
+  # datafull = pd.read_csv(data_file, encoding='utf-8')
+  # datafull = pd.DataFrame(data=datafull)
 
-  sns.set(style="darkgrid")
-  datafull = pd.read_csv(data_file, encoding='utf-8')
-  datafull = pd.DataFrame(data=datafull)
+  # with open(Path('website/plots').absolute() / 'geojs-100-mun.json', encoding='latin-1') as fh:
+  #     data = json.load(fh)
 
-  return [plot1(datafull),
-          plot2(datafull),
-          plot3(datafull),
-          plot4(datafull, data)]
+  # return [plot1(datafull),
+  #         plot2(datafull),
+  #         plot3(datafull),
+  #         plot4(datafull, data)]
+
+  plots = []
+
+  for plot in ['graph1.html', 'graph2.html', 'graph3.html', 'graph4.html']:
+    with open(Path('website/plots').absolute() / plot) as f:
+      plots.append(f.read()) 
+
+  # print(plots)
+  return plots
 
 if __name__ == '__main__':
   print(plots_list())
