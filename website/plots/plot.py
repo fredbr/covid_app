@@ -28,22 +28,10 @@ def plot1(datafull):
 
   return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
-# funcao que gera um grafico de novos casos confirmados 
-# em escala logaritmica
-def plot2(datafull):
-  datagroup = datafull[(datafull.city.isna())].groupby(['date']).sum().reset_index()
-  datagroup['date'] = range(len(datagroup['date'].values))
-
-  fig = go.Figure()
-  fig.add_trace(go.Scatter(x=datagroup['date'], y=datagroup['new_confirmed'], 
-                                  mode='lines+markers', name="Novos casos confirmados"))
-  fig.update_layout(yaxis_type='log')
-  
-  return plotly.io.to_html(fig, include_plotlyjs=False, full_html=False)
 
 # funcao para gerar grafico de casos totais, agrupados por estado
 # em escala logaritmica
-def plot3(datafull):
+def plot2(datafull):
   colores = ['aliceblue', 'azure', 'beige', 'bisque', 'black', 
            'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 
            'chartreuse', 'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 
@@ -88,7 +76,7 @@ def plot3(datafull):
 
 # funcao para gerar heatmap do brasil de casos confirmados por municipio
 # por 100k habitantes
-def plot4(datafull, geo_data):
+def plot3(datafull, geo_data):
   datacity = datafull[(datafull.city.isna() ==  False) & (datafull.is_last)]
 
   datagroup = datacity.groupby([datacity.city_ibge_code, datacity.city]).last_available_confirmed_per_100k_inhabitants.max().reset_index()
@@ -124,7 +112,7 @@ def plot4(datafull, geo_data):
 def plots_list():
   plots = []
 
-  for plot in ['graph1.html', 'graph2.html', 'graph3.html', 'graph4.html']:
+  for plot in ['graph1.html', 'graph2.html', 'graph3.html']:
     with open(Path('website/plots').absolute() / plot) as f:
       plots.append(f.read()) 
 
@@ -148,10 +136,7 @@ def main():
     f.write(plot2(datafull))
 
   with open('graph3.html', 'w+') as f:
-    f.write(plot3(datafull))
-
-  with open('graph4.html', 'w+') as f:
-    f.write(plot4(datafull, geo_data))
+    f.write(plot3(datafull, geo_data))
 
 
 if __name__ == '__main__':
