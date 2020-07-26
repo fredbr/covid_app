@@ -8,7 +8,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import json
 from urllib.request import urlopen
+import requests
+import gzip
 from pathlib import Path
+from io import BytesIO
 
 # funcao que gera um grafico de total de casos 
 # confirmados + novos casos por dia
@@ -120,12 +123,18 @@ def plots_list():
 
 # driver para gerar os aquivos pre-computados
 def main():
-  data_file = 'caso_full.csv'
+  data_link = 'https://data.brasil.io/dataset/covid19/caso_full.csv.gz'
 
-  sns.set(style="darkgrid")
-  datafull = pd.read_csv(data_file, encoding='utf-8')
+  data = requests.get(data_link)
+
+  with gzip.GzipFile(fileobj=BytesIO(data.content)) as data_file:
+    datafull = pd.read_csv(data_file, encoding='utf-8')
+
   datafull = pd.DataFrame(data=datafull)
 
+  print(len(datafull))
+
+  sns.set(style="darkgrid")
   with open('geojs-100-mun.json', encoding='latin-1') as fh:
       geo_data = json.load(fh)
 
