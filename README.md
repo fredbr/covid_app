@@ -14,8 +14,14 @@ pip install -r requeriments.txt
 
 Para executar o sevidor de teste:
 ```
-source env/bin/activate
 python3 manage.py runserver
 ```
 
-O servidor por padrão pode ser acessado por http://127.0.0.1:8000
+Para atualizar os gráficos:
+```
+cd website/plots
+python plot.py
+```
+Por padrão plot.py cria três arquivos de cache 
+
+O servidor por padrão pode ser acessado por http://127.0.0.1:8000 ou https://covid.fredbr.com
