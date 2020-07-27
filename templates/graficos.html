@@ -7,12 +7,13 @@
 
 {% block content %}
 
-{% for plot in plots %}
+{% for text, plot in plots %}
+  <h3 class="mt-5 text-center">{{text}}</h3>
+
   <div class="container">
     <div class="row" style="border: 1px solid black">
       {# <div id="plot_container" class="col-md-8 col-md-offset-2">{{plot|safe}}</div>#}
-      <div class="col-md-12">{{plot|safe}}</div>
-    </div>
+    <div class="col-md-12">{{plot|safe}}</div>
   </div>
 {% endfor %}
 

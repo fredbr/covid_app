@@ -117,9 +117,14 @@ def plots_list():
 
   for plot in ['graph1.html', 'graph2.html', 'graph3.html']:
     with open(Path('website/plots').absolute() / plot) as f:
-      plots.append(f.read()) 
+      plots.append(f.read())
 
-  return plots
+  titles = [
+    'Evolução de total de casos confirmados no desde primeiro caso confirmado no brasil',
+    'Evolução de total de casos confirmados por estado',
+    'Total de casos confirmados por 100\'000 habitantes em cada município'
+  ]
+  return zip(titles, plots)
 
 # driver para gerar os aquivos pre-computados
 def main():

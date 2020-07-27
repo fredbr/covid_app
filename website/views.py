@@ -2,9 +2,6 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from .plots.plot import plots_list
 
-class IndexView(TemplateView):
-    template_name = 'index.html'
-
 class SintomasView(TemplateView):
     template_name = 'sintomas.html'
 

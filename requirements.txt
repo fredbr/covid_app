@@ -21,3 +21,4 @@ seaborn==0.10.1
 six==1.15.0
 sqlparse==0.3.1
 urllib3==1.25.10
+wheel==0.34.2
